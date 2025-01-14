@@ -1,0 +1,138 @@
+.menu-container {
+  padding: 40px;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 28px;
+  line-height: 1.4;
+}
+
+.special-dishes-label {
+  color: #ff0000;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.dish-card a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.dish-card a:hover {
+  color: #35d43d;
+}
+
+.dish-card {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.dish-card:hover {
+  transform: translateY(-5px);
+}
+
+.dish-card img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.dish-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 15px 0 5px;
+}
+
+.dish-description {
+  font-size: 14px;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.dish-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dish-price {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.dish-rating {
+  font-size: 14px;
+  color: #FFD700;
+  display: flex;
+  align-items: center;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.nav-btn {
+  background-color: #595a59;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: #35d43d;
+}
+
+.nav-btn:disabled {
+  background-color: #d3d3d3;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .dishes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .dishes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .nav-btn {
+    font-size: 16px;
+    padding: 5px;
+  }
+}

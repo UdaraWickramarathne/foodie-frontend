@@ -1,0 +1,107 @@
+.checkout {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+  }
+  
+  .delivery-options {
+    width: 50%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .delivery-options h2 {
+    margin-bottom: 15px;
+  }
+  
+  .shipping-options {
+    display: flex;
+    margin-bottom: 15px;
+  }
+  
+  .shipping-options label {
+    margin-right: 20px;
+  }
+  
+  .shipping-address {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .address-field,
+  .phone-field {
+    margin-bottom: 15px;
+  }
+  
+  textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* In Your Bag section */
+  
+  .in-your-bag {
+    width: 40%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .in-your-bag h2 {
+    margin-bottom: 15px;
+  }
+  
+  .order-summary {
+    margin-bottom: 15px;
+  }
+  
+  .order-summary div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  
+  .order-summary .total {
+    font-weight: bold;
+  }
+  
+  /* Product card */
+  
+  .product-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .product-card img {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+  }
+  
+  .product-details {
+    flex: 1;
+  }
+  
+  .product-details h3 {
+    margin-bottom: 5px;
+  }
+  
+  .product-details p {
+    margin-bottom: 2px;
+    font-size: 12px;
+  }

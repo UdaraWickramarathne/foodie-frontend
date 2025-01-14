@@ -1,0 +1,93 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 35px;
+  height: 40px;
+  background-color: #ffffff;
+  position: fixed; /* Added to make the header fixed */
+  top: 0; /* Keeps the header at the top */
+  left: 0; /* Aligns the header to the left */
+  width: 100%; /* Ensures the header spans the full width */
+  z-index: 1000; /* Ensures the header is on top of other content */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Adds shadow for better visibility */
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 41px;
+  background: #39da49;
+  border-radius: 8px;
+  position: relative;
+}
+
+.logo-icon::after {
+  content: '';
+  position: absolute;
+  width: 18.448px;
+  height: 23.964px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-01-11/6f1b3a75-63bc-4a55-a711-675d20759f26.png) no-repeat center;
+  background-size: cover;
+}
+
+.main-nav ul {
+  display: flex;
+  list-style-type: none;
+  padding: 0px 380px;
+  margin: 0;
+}
+
+.nav-link {
+  color: #272727;
+  font-family: Poppins, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  text-decoration: none;
+  margin: 0 20px;
+}
+
+.nav-link.active {
+  color: #39da49;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.cart img {
+  width: 24px; /* Adjust width to make it smaller */
+  height: 24px; /* Adjust height to make it smaller */
+  object-fit: contain; /* Ensure the image maintains its aspect ratio */
+  margin-right: 20px; /* Optional: Add spacing between the cart and other elements */
+}
+
+
+.contact-btn {
+  background: #39da49;
+  border: none;
+  border-radius: 40px;
+  color: #ffffff;
+  font-family: Poppins, sans-serif;
+  font-size: 20px;
+  left: 10px;
+  font-weight: 500;
+  line-height: 30px;
+  width: 100px;
+  position: relative;
+  cursor: pointer;
+}
+
+
+/* Optional: Add margin to the body to prevent content from overlapping with the fixed header */
+body {
+  margin-top: 60px; /* Adjust this value to match the height of your header */
+}
