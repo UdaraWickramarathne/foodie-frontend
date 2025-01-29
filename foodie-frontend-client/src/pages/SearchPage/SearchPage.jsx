@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./SearchPage.css";
+import Lottie from "lottie-react";
+import animationData from "../../assets/search.json";
 
 const SearchPage = () => {
   // Sample product data
@@ -84,7 +86,15 @@ const SearchPage = () => {
             Selected Product: {selectedProduct}
           </div>
         ) : (
-          <div>Please select a product to view details.</div>
+          <div className="initial-content ">
+            <Lottie
+              animationData={animationData}
+              loop={true}
+              autoplay={true}
+              style={{ height: 250, width: 250 }}
+            />
+            <p className="typing-animation">Search what you want....</p>
+          </div>
         )}
       </div>
     </div>
