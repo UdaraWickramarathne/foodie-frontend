@@ -11,7 +11,7 @@ const LoginPopup = ({
   setAlertText,
 }) => {
   const [currentState, setCurrentState] = useState("LOGIN");
-  const { url, setToken } = useContext(StoreContext);
+  const { url, setToken, setUserId } = useContext(StoreContext);
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -50,7 +50,10 @@ const LoginPopup = ({
       newUrl += "/auth/login";
       try {
         const response = await axios.post(newUrl, data);
+        console.log(response.data);
+
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userId", response.data.userId);
         setToken(response.data.token);
         setShowLogin(false);
       } catch (error) {
@@ -106,6 +109,9 @@ const LoginPopup = ({
               />
               <input
                 type="tel"
+                name="phone"
+                value={data.phone}
+                onChange={onInputChange}
                 placeholder="Your phone number"
                 pattern="[0-9]{10}"
                 required
