@@ -25,7 +25,6 @@ const PaymentSuccess = () => {
         });
         if (response.status === 200) {
           localStorage.removeItem("orderData");
-          alert("Order placed successfully!");
           setCartDetails({
             itemCount: 0,
             totalAmount: 0.0,

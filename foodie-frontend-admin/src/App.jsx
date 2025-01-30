@@ -8,15 +8,13 @@ import List from "./Pages/List/list";
 import Promocode from "./Pages/Promocode/promocode";
 import AuthForm from "./Components/AuthForm/AuthForm";
 import Dashboard from "./Pages/Dashboard/dashboard";
+import { useContext } from "react";
+import { AdminContext } from "./context/AdminContext";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    navigate("/dashboard");
-  };
+  const { isLoggedIn, setIsLoggedIn } = useContext(AdminContext);
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -26,7 +24,7 @@ const App = () => {
   if (!isLoggedIn) {
     return (
       <div className="app">
-        <AuthForm onLogin={handleLogin} />
+        <AuthForm />
       </div>
     );
   }

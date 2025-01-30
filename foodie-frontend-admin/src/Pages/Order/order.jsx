@@ -1,75 +1,80 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import "./order.css";
+import { AdminContext } from "../../context/AdminContext";
 
 const Order = () => {
-    const [orders, setOrders] = useState([]);
-
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await axios.get("http://localhost:8080/orders");
-                // Filter out delivered orders
-                const pendingOrders = response.data.filter(order => order.status !== "Delivered");
-                setOrders(pendingOrders);
-            } catch (error) {
-                console.error("Error fetching orders:", error);
-            }
-        };
-        fetchOrders();
-    }, []);
-
-    const handleStatusChange = async (orderId, newStatus) => {
-        try {
-            await axios.patch(`http://localhost:8080/orders/${orderId}/set`, null, {
-                params: { status: newStatus }
-            });
-            // Refresh the orders list after update
-            const response = await axios.get("http://localhost:8080/orders");
-            const pendingOrders = response.data.filter(order => order.status !== "Delivered");
-            setOrders(pendingOrders);
-        } catch (error) {
-            console.error("Error updating status:", error);
-        }
+  const { url, token } = useContext(AdminContext);
+  const [orders, setOrders] = useState([]);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(`${url}/orders/pending`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setOrders(response.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        alert("Error fetching orders");
+      }
     };
+    fetchOrders();
+  }, []);
 
-    return (
-        <div className="order">
-            <p>Order Page</p>
-            <div className="order-list">
-                {orders.map((order, index) => (
-                    <div key={index} className="order-item">
-                        <div className="order-header">
-                            <div className="order-image">
-                                <img src="src/assets/parcel_icon.png" alt="Package" />
-                            </div>
-                            <div className="order-details">
-                                <p className="order-items">{order.order_details}</p> {/* Adjust field name if needed */}
-                                <p className="order-info">{order.user_id}</p> {/* Replace with actual user name field */}
-                                <p className="order-info">{order.address}</p>
-                                {/* Add phone number if available */}
-                            </div>
-                            <div className="order-summary">
-                                <p>Items: {order.itemCount}</p> {/* Adjust based on your data */}
-                                <p className="order-price">${order.total_amount}</p>
-                            </div>
-                            <div className="order-status">
-                                <select
-                                    value={order.status}
-                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                    className="status-dropdown"
-                                >
-                                    <option value="Pending">Pending</option>
-                                    <option value="Food Processing">Food Processing</option>
-                                    {/* Delivered option removed to prevent selection */}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+  function countItems(orderDetails) {
+    const items = orderDetails.split(",").map((item) => item.trim());
+    return items.length;
+  }
+
+  return (
+    <div className="order">
+      <p>Order Page</p>
+      <div className="order-list">
+        {orders.map((order, index) => (
+          <div key={index} className="order-item">
+            <div className="order-header">
+              <div className="order-image">
+                <img src="src/assets/parcel_icon.png" alt="Package" />
+              </div>
+              <div className="order-details">
+                <p className="order-items">{order.orderDetails}</p>
+                <p className="order-info">
+                  {order.address.split(",").slice(0, 1).join(",").trim()}
+                </p>
+                <p className="order-info">
+                  {order.address.split(",").slice(1, 3).join(",").trim()}
+                </p>
+                <p className="order-info">
+                  {order.address.split(",").slice(3, 4).join(",").trim()}
+                </p>
+              </div>
+              <div className="order-summary">
+                <p>Items: {countItems(order.orderDetails)}</p>
+                <p className="order-price">${order.totalAmount}</p>
+              </div>
+              <div className="order-status">
+                <select
+                  value={order.status}
+                  onChange={(e) => {
+                    const newOrders = [...orders];
+                    newOrders[index].status = e.target.value;
+                    setOrders(newOrders);
+                  }}
+                  className="status-dropdown"
+                >
+                  <option value="Delivered">Delivered</option>
+                  <option value="Food Processing">Food Processing</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Order;

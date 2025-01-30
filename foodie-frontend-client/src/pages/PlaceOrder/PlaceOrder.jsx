@@ -64,7 +64,7 @@ const PlaceOrder = () => {
         totalAmount: cartDetails.totalAmount,
         orderDetails: orderSummary(),
         status: "PENDING",
-        address: `${formData.firstName} ${formData.lastName}, ${formData.street}, ${formData.city}, ${formData.state}, ${formData.zipCode}, ${formData.country}`,
+        address: `${formData.firstName} ${formData.lastName}, ${formData.street} ${formData.city} ${formData.state}, ${formData.zipCode} ${formData.country}, ${formData.phone}`,
         createdAt: new Date().toISOString(),
       };
       localStorage.setItem("orderData", JSON.stringify(orderData));
