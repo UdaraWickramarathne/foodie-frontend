@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import "./LoginPopup.css";
+import "./SignUp_LogIn_Form.css"; // Make sure to use the new CSS
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
@@ -10,7 +10,7 @@ const LoginPopup = ({
   setVisible,
   setAlertText,
 }) => {
-  const [currentState, setCurrentState] = useState("LOGIN");
+  const [isActive, setIsActive] = useState(false);
   const { url, setToken, setUserId } = useContext(StoreContext);
   const [data, setData] = useState({
     name: "",
@@ -19,6 +19,7 @@ const LoginPopup = ({
     username: "",
     password: "",
   });
+  const [error, setError] = useState("");
 
   const onInputChange = (event) => {
     const { name, value } = event.target;
@@ -35,134 +36,181 @@ const LoginPopup = ({
     });
   };
 
-  const validateRegister = () => {
-    if (password.length < 6) {
-      setErrorData("Password must be atleast 6 characters long");
-      return false;
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const response = await axios.post(`${url}/auth/login`, {
+        username: data.username,
+        password: data.password,
+      });
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.userId);
+      setToken(response.data.token);
+      setUserId(response.data.userId);
+      setShowLogin(false);
+    } catch (error) {
+      setError(error.response?.data?.message || "Login failed");
     }
   };
 
-  const onLogin = async (event) => {
-    event.preventDefault();
-    setErrorData("");
-    let newUrl = url;
-    if (currentState === "LOGIN") {
-      newUrl += "/auth/login";
-      try {
-        const response = await axios.post(newUrl, data);
-        console.log(response.data);
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userId", response.data.userId);
-        setToken(response.data.token);
-        setUserId(response.data.userId);
-        setShowLogin(false);
-      } catch (error) {
-        setErrorData(error.response.data.message);
-      }
-    } else {
-      newUrl += "/auth/register";
-      try {
-        await axios.post(newUrl, data);
-        setAlertText("Account created successfully");
-        setAlertColor("#64bf47");
-        setVisible(true);
-        clearData();
-        setCurrentState("LOGIN");
-      } catch (error) {
-        console.log(error);
-        setErrorData(error.response.data.message);
-      }
+    if (data.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      await axios.post(`${url}/auth/register`, data);
+      setAlertText("Account created successfully");
+      setAlertColor("#64bf47");
+      setVisible(true);
+      clearData();
+      setIsActive(false);
+    } catch (error) {
+      setError(error.response?.data?.message || "Registration failed");
     }
   };
-
-  const [errorData, setErrorData] = useState(" ");
 
   return (
-    <div className="login-popup">
-      <form onSubmit={onLogin} className="login-popup-container">
-        <div className="login-popup-title">
-          <h2>{currentState}</h2>
-          <img
-            onClick={() => setShowLogin(false)}
-            src={assets.cross_icon}
-            alt=""
-          />
-        </div>
-        <div className="login-popup-inputs">
-          {currentState === "SIGNUP" ? (
-            <>
+    <div className="auth-container">
+      <div className={`container ${isActive ? "active" : ""}`}>
+        <div className="form-box login">
+          <form onSubmit={handleLogin}>
+            <h1>Login</h1>
+            {error && <div className="error-message">{error}</div>}
+            <div className="input-box">
               <input
-                name="name"
-                onChange={onInputChange}
-                value={data.name}
                 type="text"
+                name="username"
+                placeholder="Username"
+                required
+                value={data.username}
+                onChange={onInputChange}
+              />
+              <i className="bx bxs-user"></i>
+            </div>
+            <div className="input-box">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+                value={data.password}
+                onChange={onInputChange}
+              />
+              <i className="bx bxs-lock-alt"></i>
+            </div>
+            <div className="forgot-link">
+              <a href="#">Forgot Password?</a>
+            </div>
+            <button type="submit" className="btn">
+              Login
+            </button>
+          </form>
+        </div>
+
+        <div className="form-box register">
+          <form onSubmit={handleRegister}>
+            <h1>Registration</h1>
+            {error && <div className="error-message">{error}</div>}
+            <div className="input-box">
+              <input
+                type="text"
+                name="name"
                 placeholder="Your name"
                 required
+                value={data.name}
+                onChange={onInputChange}
               />
+              <i className="bx bxs-user"></i>
+            </div>
+            <div className="input-box">
               <input
+                type="email"
                 name="email"
+                placeholder="Email"
+                required
                 value={data.email}
                 onChange={onInputChange}
-                type="email"
-                placeholder="Your email"
-                required
               />
+              <i className="bx bxs-envelope"></i>
+            </div>
+            <div className="input-box">
               <input
                 type="tel"
                 name="phone"
-                value={data.phone}
-                onChange={onInputChange}
-                placeholder="Your phone number"
+                placeholder="Phone"
                 pattern="[0-9]{10}"
                 required
+                value={data.phone}
+                onChange={onInputChange}
               />
-            </>
-          ) : (
-            <></>
-          )}
-
-          <input
-            name="username"
-            value={data.username}
-            onChange={onInputChange}
-            type="text"
-            placeholder="Your username"
-            required
-          />
-          <input
-            name="password"
-            value={data.password}
-            onChange={onInputChange}
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <p className="login-popup-error">{errorData}</p>
+              <i className="bx bxs-phone"></i>
+            </div>
+            <div className="input-box">
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                required
+                value={data.username}
+                onChange={onInputChange}
+              />
+              <i className="bx bxs-user"></i>
+            </div>
+            <div className="input-box">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+                value={data.password}
+                onChange={onInputChange}
+              />
+              <i className="bx bxs-lock-alt"></i>
+            </div>
+            <button type="submit" className="btn">
+              Register
+            </button>
+          </form>
         </div>
-        <button type="submit">
-          {currentState === "SIGNUP" ? "Create Account" : "Login"}
-        </button>
-        {currentState === "SIGNUP" ? (
-          <div className="login-popup-condition">
-            <input type="checkbox" required />
-            <p>By continuing, i agree to the terms of use & privacy policy.</p>
+
+        <div className="toggle-box">
+          <div className="toggle-panel toggle-left">
+            <h1>Hello, Welcome!</h1>
+            <p>Don't have an account?</p>
+            <button
+              className="btn register-btn"
+              onClick={() => setIsActive(true)}
+            >
+              Register
+            </button>
           </div>
-        ) : (
-          <></>
-        )}
-        {currentState === "LOGIN" ? (
-          <p>
-            Create a new account?{" "}
-            <span onClick={() => setCurrentState("SIGNUP")}>Click here</span>
-          </p>
-        ) : (
-          <p>
-            Already have an account?{" "}
-            <span onClick={() => setCurrentState("LOGIN")}>Login here</span>
-          </p>
-        )}
-      </form>
+
+          <div className="toggle-panel toggle-right">
+            <h1>Welcome Back!</h1>
+            <p>Already have an account?</p>
+            <button
+              className="btn login-btn"
+              onClick={() => setIsActive(false)}
+            >
+              Login
+            </button>
+          </div>
+        </div>
+
+        <img
+          className="close-icon"
+          onClick={() => setShowLogin(false)}
+          src={assets.cross_icon}
+          alt="Close"
+        />
+      </div>
     </div>
   );
 };
