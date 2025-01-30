@@ -50,7 +50,17 @@ const FoodDisplay = ({ category }) => {
   }, []);
 
   if (isLoading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="food-display" id="food-display">
+        <h2>Top dishes near you</h2>
+        <div className="food-display-list">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -60,15 +70,15 @@ const FoodDisplay = ({ category }) => {
         {products.map((product) => {
           if (category == "All" || product.category == category) {
             return (
-              // <FoodItem
-              //   key={product.id}
-              //   id={product.id}
-              //   name={product.name}
-              //   description={product.description}
-              //   price={product.price}
-              //   image={imageUrls[product.id]}
-              // />
-              <SkeletonCard />
+              <FoodItem
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                image={imageUrls[product.id]}
+              />
+              
             );
           }
         })}
