@@ -2,31 +2,36 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./order.css";
 
-const dummyOrders = [
-    {
-        id: 1,
-        customerName: "John Doe",
-        address: "123 Main St, New York, NY 10001",
-        phone: "9876543210",
-        items: "Greek salad x 2, Veg salad x 1, Clover Salad x 2, Chicken Salad x 4, Lasagna Rolls x 2, Peri Peri Rolls x 2",
-        itemCount: 6,
-        totalPrice: 224,
-        status: "Delivered"
-    },
-    {
-        id: 2,
-        customerName: "Jane Smith",
-        address: "456 Park Ave, San Francisco, CA 94102",
-        phone: "9876543211",
-        items: "Greek salad x 3, Veg salad x 2",
-        itemCount: 2,
-        totalPrice: 74,
-        status: "Food Processing"
-    }
-];
-
 const Order = () => {
-    const [orders, setOrders] = useState(dummyOrders);
+    const [orders, setOrders] = useState([]);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/orders");
+                // Filter out delivered orders
+                const pendingOrders = response.data.filter(order => order.status !== "Delivered");
+                setOrders(pendingOrders);
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            }
+        };
+        fetchOrders();
+    }, []);
+
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            await axios.patch(`http://localhost:8080/orders/${orderId}/set`, null, {
+                params: { status: newStatus }
+            });
+            // Refresh the orders list after update
+            const response = await axios.get("http://localhost:8080/orders");
+            const pendingOrders = response.data.filter(order => order.status !== "Delivered");
+            setOrders(pendingOrders);
+        } catch (error) {
+            console.error("Error updating status:", error);
+        }
+    };
 
     return (
         <div className="order">
@@ -39,28 +44,24 @@ const Order = () => {
                                 <img src="src/assets/parcel_icon.png" alt="Package" />
                             </div>
                             <div className="order-details">
-                                <p className="order-items">{order.items}</p>
-                                <p className="order-info">{order.customerName}</p>
+                                <p className="order-items">{order.order_details}</p> {/* Adjust field name if needed */}
+                                <p className="order-info">{order.user_id}</p> {/* Replace with actual user name field */}
                                 <p className="order-info">{order.address}</p>
-                                <p className="order-info">{order.phone}</p>
+                                {/* Add phone number if available */}
                             </div>
                             <div className="order-summary">
-                                <p>Items: {order.itemCount}</p>
-                                <p className="order-price">${order.totalPrice}</p>
+                                <p>Items: {order.itemCount}</p> {/* Adjust based on your data */}
+                                <p className="order-price">${order.total_amount}</p>
                             </div>
                             <div className="order-status">
                                 <select
                                     value={order.status}
-                                    onChange={(e) => {
-                                        const newOrders = [...orders];
-                                        newOrders[index].status = e.target.value;
-                                        setOrders(newOrders);
-                                    }}
+                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
                                     className="status-dropdown"
                                 >
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Food Processing">Food Processing</option>
                                     <option value="Pending">Pending</option>
+                                    <option value="Food Processing">Food Processing</option>
+                                    {/* Delivered option removed to prevent selection */}
                                 </select>
                             </div>
                         </div>
