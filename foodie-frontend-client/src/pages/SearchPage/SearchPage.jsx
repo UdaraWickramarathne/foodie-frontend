@@ -1,48 +1,49 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./SearchPage.css";
 import Lottie from "lottie-react";
 import animationData from "../../assets/search.json";
+import axios from "axios";
+import { StoreContext } from "../../context/StoreContext";
+import FoodItem from "../../components/FoodItem/FoodItem";
 
 const SearchPage = () => {
-  // Sample product data
-  const [products] = useState([
-    "Myco Farm Oyster Mushroom 200g",
-    "4Ever Face Wash Aloe Lavender 100ml",
-    "4Ever Face Wash Gold Whitening 100ml",
-    "4Ever Face Wash Kohomba Kaha 100ml",
-    "4Ever Face Wash Kohomba Kaha 185ml",
-    "4Ever Face Wash Rose Anti Acne 100ml",
-    "4Ever Face Wash Tea Tree Oil 100ml",
-  ]);
-
-  // Search input state
   const [searchInput, setSearchInput] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProductImageUrl, setSelectedProductImageUrl] = useState("");
 
-  // Handle search input changes
-  const handleSearchChange = (e) => {
+  const { url } = useContext(StoreContext);
+
+  const handleSearchChange = async (e) => {
     const value = e.target.value;
     setSearchInput(value);
-
-    // Filter products
     if (value) {
-      const filtered = products.filter((product) =>
-        product.toLowerCase().includes(value.toLowerCase())
+      const response = await axios.get(
+        `${url}/food/products/search?keyword=${value}`
       );
-      setFilteredProducts(filtered);
+      setFilteredProducts(response.data);
     } else {
       setFilteredProducts([]);
     }
   };
 
-  const handleProductClick = (product) => {
+  const handleProductClick = async (product) => {
     setSelectedProduct(product);
-    setSearchInput(""); // Clear the input after selecting a product
-    setFilteredProducts([]); // Hide the dropdown
+    setSearchInput("");
+    setFilteredProducts([]);
+    axios
+      .get(`${url}/food/product/${product.id}/image`, {
+        responseType: "blob",
+      })
+      .then((response) => {
+        const imageUrl = URL.createObjectURL(response.data);
+        setSelectedProductImageUrl(imageUrl);
+      })
+      .catch((error) => {
+        console.error("Error fetching product image:", error);
+      });
   };
 
-  // Clear search input
   const clearSearch = () => {
     setSearchInput("");
     setFilteredProducts([]);
@@ -75,16 +76,21 @@ const SearchPage = () => {
               className="search-result-item"
               onClick={() => handleProductClick(product)}
             >
-              {product}
+              {product.name}
             </div>
           ))}
         </div>
       </div>
       <div className="search-page-content">
         {selectedProduct ? (
-          <div className="selected-product">
-            Selected Product: {selectedProduct}
-          </div>
+          <FoodItem
+            key={selectedProduct.id}
+            id={selectedProduct.id}
+            name={selectedProduct.name}
+            description={selectedProduct.description}
+            price={selectedProduct.price}
+            image={selectedProductImageUrl}
+          />
         ) : (
           <div className="initial-content ">
             <Lottie

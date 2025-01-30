@@ -7,6 +7,7 @@ import SkeletonCard from "../Skelaton/SkeletonCard";
 
 const FoodDisplay = ({ category }) => {
   const { food_list, url } = useContext(StoreContext);
+
   const [imageUrls, setImageUrls] = useState({});
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +17,6 @@ const FoodDisplay = ({ category }) => {
       try {
         let newUrl = url + "/food/products";
         const response = await axios.get(newUrl);
-        console.log(response.data);
         fetchProductsImages(response.data);
         setProducts(response.data);
         setIsLoading(false);
@@ -38,7 +38,6 @@ const FoodDisplay = ({ category }) => {
               ...prevState,
               [product.id]: imageUrl,
             }));
-            console.log("Image URL:", imageUrl);
           })
           .catch((error) => {
             console.error("Error fetching product image:", error);
@@ -50,7 +49,17 @@ const FoodDisplay = ({ category }) => {
   }, []);
 
   if (isLoading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="food-display" id="food-display">
+        <h2>Top dishes near you</h2>
+        <div className="food-display-list">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -60,15 +69,14 @@ const FoodDisplay = ({ category }) => {
         {products.map((product) => {
           if (category == "All" || product.category == category) {
             return (
-              // <FoodItem
-              //   key={product.id}
-              //   id={product.id}
-              //   name={product.name}
-              //   description={product.description}
-              //   price={product.price}
-              //   image={imageUrls[product.id]}
-              // />
-              <SkeletonCard />
+              <FoodItem
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                image={imageUrls[product.id]}
+              />
             );
           }
         })}

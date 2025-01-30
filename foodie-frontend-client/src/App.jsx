@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
@@ -9,6 +9,7 @@ import LoginPopup from "./components/LoginPopup/LoginPopup";
 import MyOrders from "./pages/MyOrders/MyOrders";
 import SearchPage from "./pages/SearchPage/SearchPage";
 import SimpleAlert from "./components/SimpleAlert/SimpleAlert";
+import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -50,6 +51,7 @@ const App = () => {
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/myorders" element={<MyOrders />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/success" element={<PaymentSuccess />} />
         </Routes>
       </div>
       <Footer />

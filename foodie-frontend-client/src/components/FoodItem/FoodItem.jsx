@@ -8,6 +8,11 @@ const FoodItem = ({ id, name, price, description, image }) => {
   const [itemCount, setItemCount] = useState(1);
   const { addToCart } = useContext(StoreContext);
 
+  const handleCart = () => {
+    addToCart(id, itemCount, price);
+    setItemCount(1);
+  };
+
   return (
     <div className="food-item">
       <div className="food-item-img-container">
@@ -38,10 +43,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
         <p className="food-item-desc">{description}</p>
         <div className="food-item-actions">
           <p className="food-item-price">${price}.00</p>
-          <button
-            onClick={() => addToCart(id, itemCount)}
-            className="food-item-add-to-cart"
-          >
+          <button onClick={handleCart} className="food-item-add-to-cart">
             Add to cart
           </button>
         </div>
