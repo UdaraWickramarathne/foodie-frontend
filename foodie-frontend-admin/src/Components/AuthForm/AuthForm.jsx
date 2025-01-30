@@ -81,7 +81,7 @@ const AuthForm = ({ onLogin }) => {
           <div className="input-box">
             <input
               type="text"
-              name="username"
+              name="username"   
               placeholder="Username"
               required
               value={formData.username}
