@@ -7,13 +7,20 @@ import { StoreContext } from "../../context/StoreContext";
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
 
-  const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
+  const { token, setToken, cartDetails, setCartDetails, setUserId } =
+    useContext(StoreContext);
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.setItem("token", "");
+    localStorage.setItem("userId", "");
     setToken("");
+    setUserId("");
+    setCartDetails({
+      itemCount: 0,
+      totalAmount: 0.0,
+    });
     navigate("/");
   };
 
@@ -39,21 +46,21 @@ const Navbar = ({ setShowLogin }) => {
           Explore
         </Link>
         <a
-          href="#explore-menu"
+          href="/#explore-menu"
           onClick={() => setMenu("menu")}
           className={menu === "menu" ? "active" : ""}
         >
           Menu
         </a>
         <a
-          href="#app-download"
+          href="/#app-download"
           onClick={() => setMenu("mobile-app")}
           className={menu === "mobile-app" ? "active" : ""}
         >
           Mobile App
         </a>
         <a
-          href="#footer"
+          href="/#footer"
           onClick={() => setMenu("contact-us")}
           className={menu === "contact-us" ? "active" : ""}
         >
@@ -68,7 +75,9 @@ const Navbar = ({ setShowLogin }) => {
           <Link to="/cart">
             <img src={assets.basket_icon} alt="" />
           </Link>
-          <div className={getTotalCartAmount() === 0 ? "" : "dot"}></div>
+          <div className={cartDetails.totalAmount === 0.0 ? "hidden" : "dot"}>
+            <p>{cartDetails.itemCount}</p>
+          </div>
         </div>
         {!token ? (
           <button onClick={() => setShowLogin(true)}>Sign in</button>
@@ -76,7 +85,7 @@ const Navbar = ({ setShowLogin }) => {
           <div className="navbar-profile">
             <img src={assets.profile_icon} alt="" />
             <ul className="nav-profile-dropdown">
-              <li>
+              <li onClick={() => navigate("/myorders")}>
                 <img src={assets.bag_icon} alt="" />
                 <p>Orders</p>
               </li>

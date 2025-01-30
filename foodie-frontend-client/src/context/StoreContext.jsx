@@ -1,93 +1,131 @@
 import { createContext, useEffect, useState } from "react";
 import { food_list } from "../assets/assets";
 import axios from "axios";
-
+import { Snackbar, Alert } from "@mui/material";
+import AlertDialogSlide from "../components/AlertDialog/AlertDialog";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-  const [cartItems, setCartItems] = useState({});
-
+  const [cartDetails, setCartDetails] = useState({
+    itemCount: 0,
+    totalAmount: 0.0,
+  });
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [userId, setUserId] = useState(localStorage.getItem("userId") || "");
-
   const url = "http://localhost:8080";
 
-  const addToCart = (productId, quantity) => {
-    setCartItems((prev) => ({ ...prev, [productId]: quantity }));
-  };
+  const [orderDetails, setOrderDetails] = useState([]);
 
-  const incrementCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-  };
-
-  const decrementCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-  };
-
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => ({
-      ...prev,
-      [itemId]: 0,
-    }));
-  };
-
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = food_list.find((food) => food._id === item);
-        totalAmount += itemInfo.price * cartItems[item];
-      }
+  const addToCart = async (productId, quantity, price) => {
+    if (token === "") {
+      setShowAlert(true);
+      return;
     }
-    return totalAmount;
-  };
-
-  useEffect(() => {
-    const validateToken = async () => {
-      try {
-        if (!token) return;
-
-        const response = await axios.get(`${url}/auth/validate?token=${token}`);
-        console.log("Token validation response:", response.data);
-
-        const { userId: validatedUserId } = response.data;
-        setToken(token);
-        setUserId(validatedUserId);
-
-        localStorage.setItem("token", token);
-        localStorage.setItem("userId", validatedUserId);
-      } catch (error) {
-        console.error("Error validating token:", error.response?.data || error);
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("userId");
+    try {
+      const response = await axios.post(
+        `${url}/cart/${userId}/items?productId=${productId}&quantity=${quantity}&productPrice=${price}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setShowSuccessAlert(true);
+      setCartDetails((prev) => ({
+        ...prev,
+        itemCount: response.data.cartProducts.length,
+        totalAmount: response.data.totalAmount,
+      }));
+    } catch (error) {
+      if (error.response.status === 401) {
+        setShowAlert(true);
         setToken("");
         setUserId("");
       }
-    };
+      console.error("Error adding to cart:", error.response?.data || error);
+    }
+  };
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+  const getCartDetails = async () => {
+    try {
+      const response = await axios.get(`${url}/cart/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCartDetails({
+        itemCount: response.data.cartProducts.length,
+        totalAmount: response.data.totalAmount,
+      });
+    } catch (error) {
+      console.log("Error getting cart items:", error.response?.data || error);
+    }
+  };
+
+  const validateToken = async () => {
+    try {
+      if (!token) return;
+
+      const response = await axios.get(`${url}/auth/validate?token=${token}`);
+
+      const { userId: validatedUserId } = response.data;
+      setToken(token);
+      setUserId(validatedUserId);
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", validatedUserId);
+    } catch (error) {
+      console.error("Error validating token:", error.response?.data || error);
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      setToken("");
+      setUserId("");
+    }
+  };
+
+  useEffect(() => {
     validateToken();
-  }, [token, url]);
+  }, []);
+
+  useEffect(() => {
+    if (token && userId) {
+      getCartDetails();
+    }
+  }, [token, userId]);
 
   const contextValue = {
     food_list,
-    cartItems,
-    setCartItems,
+    cartDetails,
+    setCartDetails,
     addToCart,
-    incrementCart,
-    decrementCart,
-    removeFromCart,
-    getTotalCartAmount,
     token,
     setToken,
+    getCartDetails,
     url,
     userId,
     setUserId,
+    setShowAlert,
+    orderDetails,
+    setOrderDetails,
   };
 
   return (
     <StoreContext.Provider value={contextValue}>
       {props.children}
+      <Snackbar
+        open={showSuccessAlert}
+        onClose={() => setShowSuccessAlert(false)}
+        autoHideDuration={2000}
+      >
+        <Alert sx={{ bgcolor: "#64bf47" }} variant="filled" severity="success">
+          Product added successfully.
+        </Alert>
+      </Snackbar>
+      <AlertDialogSlide open={showAlert} onClose={setShowAlert} />
     </StoreContext.Provider>
   );
 };

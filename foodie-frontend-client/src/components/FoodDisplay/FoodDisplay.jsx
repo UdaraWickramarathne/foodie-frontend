@@ -7,6 +7,7 @@ import SkeletonCard from "../Skelaton/SkeletonCard";
 
 const FoodDisplay = ({ category }) => {
   const { food_list, url } = useContext(StoreContext);
+
   const [imageUrls, setImageUrls] = useState({});
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +17,6 @@ const FoodDisplay = ({ category }) => {
       try {
         let newUrl = url + "/food/products";
         const response = await axios.get(newUrl);
-        console.log(response.data);
         fetchProductsImages(response.data);
         setProducts(response.data);
         setIsLoading(false);
@@ -38,7 +38,6 @@ const FoodDisplay = ({ category }) => {
               ...prevState,
               [product.id]: imageUrl,
             }));
-            console.log("Image URL:", imageUrl);
           })
           .catch((error) => {
             console.error("Error fetching product image:", error);
@@ -59,8 +58,8 @@ const FoodDisplay = ({ category }) => {
           <SkeletonCard />
           <SkeletonCard />
         </div>
-      </div>
-    );
+      </div>
+    );
   }
 
   return (
@@ -78,7 +77,6 @@ const FoodDisplay = ({ category }) => {
                 price={product.price}
                 image={imageUrls[product.id]}
               />
-              
             );
           }
         })}
