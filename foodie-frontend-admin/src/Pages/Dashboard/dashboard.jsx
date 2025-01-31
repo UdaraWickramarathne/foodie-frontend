@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import './Dashboard.css';
+import { AdminContext } from '../../context/AdminContext';
 
 const Dashboard = () => {
+  const {token} = useContext(AdminContext);  
   const dailyData = [
     { date: '2023-09-01', amount: 2450 },
     { date: '2023-09-02', amount: 3120 },
