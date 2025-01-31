@@ -131,6 +131,14 @@ const Cart = () => {
     });
   }, [orderDetails]);
 
+  const handleCheckout = () => {
+    if (orderDetails.length === 0) {
+      alert("Please add items to cart to proceed");
+      return;
+    }
+    navigate("/order");
+  };
+
   return (
     <div className="cart">
       <ConfirmationAlert open={showAlert} onClose={handleConfirmRemove} />
@@ -197,9 +205,7 @@ const Cart = () => {
               </b>
             </div>
           </div>
-          <button onClick={() => navigate("/order")}>
-            PROCEED TO CHECKOUT
-          </button>
+          <button onClick={handleCheckout}>PROCEED TO CHECKOUT</button>
         </div>
         <div className="cart-promo-code">
           <div>
