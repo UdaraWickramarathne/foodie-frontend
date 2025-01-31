@@ -1,25 +1,81 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./FoodDisplay.css";
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../FoodItem/FoodItem";
+import axios from "axios";
+import SkeletonCard from "../Skelaton/SkeletonCard";
 
 const FoodDisplay = ({ category }) => {
-  const { food_list } = useContext(StoreContext);
+  const { food_list, url } = useContext(StoreContext);
+
+  const [imageUrls, setImageUrls] = useState({});
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        let newUrl = url + "/food/products";
+        const response = await axios.get(newUrl);
+        fetchProductsImages(response.data);
+        setProducts(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    const fetchProductsImages = (products) => {
+      products.forEach((product) => {
+        let newUrl = url + `/food/product/${product.id}/image`;
+        axios
+          .get(newUrl, {
+            responseType: "blob",
+          })
+          .then((response) => {
+            const imageUrl = URL.createObjectURL(response.data);
+            setImageUrls((prevState) => ({
+              ...prevState,
+              [product.id]: imageUrl,
+            }));
+          })
+          .catch((error) => {
+            console.error("Error fetching product image:", error);
+          });
+      });
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="food-display" id="food-display">
+        <h2>Top dishes near you</h2>
+        <div className="food-display-list">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="food-display" id="food-display">
       <h2>Top dishes near you</h2>
       <div className="food-display-list">
-        {food_list.map((item, index) => {
-          if (category == "All" || item.category == category) {
+        {products.map((product) => {
+          if (category == "All" || product.category == category) {
             return (
               <FoodItem
-                key={index}
-                id={item._id}
-                name={item.name}
-                description={item.description}
-                price={item.price}
-                image={item.image}
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                image={imageUrls[product.id]}
               />
             );
           }

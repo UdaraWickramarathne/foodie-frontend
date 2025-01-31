@@ -58,6 +58,14 @@
 .search-page-content {
   color: black;
 }
+
+.search-page-content .initial-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 .no-results {
   padding: 10px;
   text-align: center;
@@ -67,9 +75,46 @@
 .search-page-content {
   margin-top: 20px;
   font-size: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin-top: 30px;
+  gap: 30px;
+  row-gap: 50px;
 }
 
 .selected-product {
   font-weight: bold;
   color: #333;
+}
+
+.typing-animation {
+  display: inline-block;
+  overflow: hidden;
+  color: #555;
+  border-right: 2px solid #333;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  animation: typing 3.5s steps(30, end) infinite,
+    blink-caret 0.75s step-end infinite;
+  animation-iteration-count: infinite;
+  animation-delay: 0s, 3s;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 20ch;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #333;
+  }
 }

@@ -1,23 +1,139 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../assets/assets";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import ConfirmationAlert from "../../components/AlertDialog/ConfirmationAlert";
 
 const Cart = () => {
   const {
-    cartItems,
-    food_list,
-    removeFromCart,
-    decrementCart,
-    incrementCart,
-    getTotalCartAmount,
+    url,
+    userId,
+    token,
+    cartDetails,
+    setCartDetails,
+    getCartDetails,
+    setOrderDetails,
+    orderDetails,
   } = useContext(StoreContext);
 
   const navigate = useNavigate();
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const fetchOrderDetails = async () => {
+    try {
+      const response = await axios.get(`${url}/cart/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const cartProducts = response.data.cartProducts;
+      const updatedCartItems = await Promise.all(
+        cartProducts.map(async (product) => {
+          const productResponse = await axios.get(
+            `${url}/food/product/${product.productId}`
+          );
+          const productImageResponse = await axios.get(
+            `${url}/food/product/${product.productId}/image`,
+            { responseType: "blob" }
+          );
+          const imageUrl = URL.createObjectURL(productImageResponse.data);
+          return {
+            productId: product.productId,
+            image: imageUrl,
+            title: productResponse.data.name,
+            price: product.productPrice,
+            quantity: product.quantity,
+            total: product.productPrice * product.quantity,
+          };
+        })
+      );
+      setOrderDetails(updatedCartItems);
+    } catch (error) {
+      console.log("Error getting cart items:", error.response?.data || error);
+    }
+  };
+
+  const incrementCart = (productId) => {
+    const updatedItem = orderDetails.find(
+      (item) => item.productId === productId
+    );
+    const newQuantity = updatedItem.quantity + 1;
+    setOrderDetails((prevOrderDetails) =>
+      prevOrderDetails.map((item) =>
+        item.productId === productId
+          ? { ...item, quantity: newQuantity, total: newQuantity * item.price }
+          : item
+      )
+    );
+  };
+
+  const decrementCart = (productId) => {
+    const updatedItem = orderDetails.find(
+      (item) => item.productId === productId
+    );
+    const newQuantity = updatedItem.quantity - 1;
+    if (newQuantity < 1) return;
+    setOrderDetails((prevOrderDetails) =>
+      prevOrderDetails.map((item) =>
+        item.productId === productId
+          ? { ...item, quantity: newQuantity, total: newQuantity * item.price }
+          : item
+      )
+    );
+  };
+
+  const getTotalAmount = () => {
+    return orderDetails.reduce((total, item) => total + item.total, 0);
+  };
+
+  const removeItemFromCart = async (productId) => {
+    try {
+      const response = await axios.delete(
+        `${url}/cart/${userId}/items/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setOrderDetails((prevOrderDetails) =>
+          prevOrderDetails.filter((item) => item.productId !== productId)
+        );
+        getCartDetails();
+      }
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+    }
+  };
+  const handleRemoveClick = (item) => {
+    setSelectedItem(item); // Set the item to be removed
+    setShowAlert(true); // Open the confirmation alert
+  };
+
+  const handleConfirmRemove = (confirmed) => {
+    setShowAlert(false);
+    if (confirmed && selectedItem) {
+      removeItemFromCart(selectedItem.productId); // Call remove function if confirmed
+    }
+  };
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [token]);
+
+  useEffect(() => {
+    setCartDetails((prev) => {
+      return { ...prev, totalAmount: getTotalAmount() };
+    });
+  }, [orderDetails]);
 
   return (
     <div className="cart">
+      <ConfirmationAlert open={showAlert} onClose={handleConfirmRemove} />
       <div className="cart-items">
         <div className="cart-items-title">
           <p>Items</p>
@@ -29,36 +145,34 @@ const Cart = () => {
         </div>
         <br />
         <hr />
-        {food_list.map((item, index) => {
-          if (cartItems[item._id] > 0) {
-            return (
-              <>
-                <div key={index} className="cart-items-title cart-items-item">
-                  <img src={item.image} alt="" />
-                  <p>{item.name}</p>
-                  <p>${item.price}</p>
-                  <div className="cart-items-quantity">
-                    <img
-                      src={assets.remove_icon_red}
-                      alt=""
-                      onClick={() => decrementCart(item._id)}
-                    />
-                    <p>{cartItems[item._id]}</p>
-                    <img
-                      src={assets.add_icon_green}
-                      alt=""
-                      onClick={() => incrementCart(item._id)}
-                    />
-                  </div>
-                  <p>${item.price * cartItems[item._id]}</p>
-                  <p className="cross" onClick={() => removeFromCart(item._id)}>
-                    X
-                  </p>
+        {orderDetails.map((item, index) => {
+          return (
+            <>
+              <div key={index} className="cart-items-title cart-items-item">
+                <img src={item.image} alt="" />
+                <p>{item.title}</p>
+                <p>${item.price}</p>
+                <div className="cart-items-quantity">
+                  <img
+                    src={assets.remove_icon_red}
+                    alt=""
+                    onClick={() => decrementCart(item.productId)}
+                  />
+                  <p>{item.quantity}</p>
+                  <img
+                    src={assets.add_icon_green}
+                    alt=""
+                    onClick={() => incrementCart(item.productId)}
+                  />
                 </div>
-                <hr />
-              </>
-            );
-          }
+                <p>${item.price * item.quantity}</p>
+                <p className="cross" onClick={() => handleRemoveClick(item)}>
+                  X
+                </p>
+              </div>
+              <hr />
+            </>
+          );
         })}
       </div>
       <div className="cart-bottom">
@@ -67,18 +181,19 @@ const Cart = () => {
           <div>
             <div className="cart-total-details">
               <p>Subtotal</p>
-              <p>${getTotalCartAmount()}.00</p>
+              <p>${cartDetails.totalAmount}.00</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() == 0 ? 0 : 2}.00</p>
+              <p>FREE</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
               <b>
-                ${getTotalCartAmount() == 0 ? 0 : 2 + getTotalCartAmount()}.00
+                ${cartDetails.totalAmount}
+                .00
               </b>
             </div>
           </div>

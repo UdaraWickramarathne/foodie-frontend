@@ -53,14 +53,15 @@
   position: absolute;
   top: -8px;
   right: -8px;
-  width: 10px;
-  height: 10px;
+  width: 13px;
+  height: 13px;
   background-color: #64bf47;
   border-radius: 50%;
 }
+
 .navbar-search-icon .dot p {
   color: white;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   position: absolute;
   top: 50%;
