@@ -6,13 +6,12 @@ import { AdminContext } from "../../context/AdminContext";
 const Order = () => {
   const { url, token } = useContext(AdminContext);
   const [orders, setOrders] = useState([]);
+  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(`${url}/orders/pending`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(response.data);
       } catch (error) {
@@ -21,19 +20,44 @@ const Order = () => {
       }
     };
     fetchOrders();
-  }, []);
+  }, [url, token]);
 
   function countItems(orderDetails) {
-    const items = orderDetails.split(",").map((item) => item.trim());
-    return items.length;
+    return orderDetails.split(",").length;
   }
+
+  const handleStatusChange = async (orderId, newStatus, previousStatus) => {
+    try {
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+
+      await axios.patch(
+        `${url}/orders/${orderId}/set?status=${newStatus}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order.id === orderId ? { ...order, status: previousStatus } : order
+        )
+      );
+      alert("Failed to update status. Please try again.");
+    }
+  };
 
   return (
     <div className="order">
       <p>Order Page</p>
       <div className="order-list">
-        {orders.map((order, index) => (
-          <div key={index} className="order-item">
+        {orders.map((order) => (
+          <div key={order.id} className="order-item">
             <div className="order-header">
               <div className="order-image">
                 <img src="src/assets/parcel_icon.png" alt="Package" />
@@ -57,16 +81,12 @@ const Order = () => {
               <div className="order-status">
                 <select
                   value={order.status}
-                  onChange={(e) => {
-                    const newOrders = [...orders];
-                    newOrders[index].status = e.target.value;
-                    setOrders(newOrders);
-                  }}
+                  onChange={(e) => handleStatusChange(order.id, e.target.value, order.status)}
                   className="status-dropdown"
                 >
-                  <option value="Delivered">Delivered</option>
-                  <option value="Food Processing">Food Processing</option>
-                  <option value="Pending">Pending</option>
+                  <option value="DELIVERED">Delivered</option>
+                  <option value="FOOD_PROCESSING">Food Processing</option>
+                  <option value="PENDING">Pending</option>
                 </select>
               </div>
             </div>

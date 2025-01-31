@@ -10,7 +10,6 @@ const PromoCode = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Mock customer data
   useEffect(() => {
     const mockCustomers = [
       { id: 1, name: 'Customer 1', email: 'customer1@example.com' },
