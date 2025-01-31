@@ -2,23 +2,25 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import "./order.css";
 import { AdminContext } from "../../context/AdminContext";
+import Button from "@mui/material/Button";
 
 const Order = () => {
   const { url, token } = useContext(AdminContext);
   const [orders, setOrders] = useState([]);
-  
+  const [isUpdating, setIsUpdating] = useState(false); // Track API call status
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${url}/orders/pending`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(`${url}/orders/pending`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setOrders(response.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        alert("Error fetching orders");
-      }
-    };
     fetchOrders();
   }, [url, token]);
 
@@ -27,9 +29,10 @@ const Order = () => {
   }
 
   const handleStatusChange = async (orderId, newStatus, previousStatus) => {
+    setIsUpdating(true);
     try {
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
           order.id === orderId ? { ...order, status: newStatus } : order
         )
       );
@@ -38,24 +41,49 @@ const Order = () => {
         `${url}/orders/${orderId}/set?status=${newStatus}`,
         null,
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
     } catch (error) {
       console.error("Error updating status:", error);
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
           order.id === orderId ? { ...order, status: previousStatus } : order
         )
       );
-      alert("Failed to update status. Please try again.");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
+  const [loading, setLoading] = React.useState(false);
+  function handleClick() {
+    setLoading(true);
+    fetchOrders().then(() => setLoading(false));
+  }
+
   return (
     <div className="order">
-      <p>Order Page</p>
+      {isUpdating && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
+      <div className="order-header-container">
+        <Button
+          onClick={handleClick}
+          loading={loading}
+          loadingIndicator="Loading…"
+          variant="outlined"
+        >
+          Fetch data
+        </Button>
+      </div>
       <div className="order-list">
+        {orders.length === 0 ? (
+          <div className="no-orders"> No orders available</div>
+        ) : null}
         {orders.map((order) => (
           <div key={order.id} className="order-item">
             <div className="order-header">
@@ -81,11 +109,13 @@ const Order = () => {
               <div className="order-status">
                 <select
                   value={order.status}
-                  onChange={(e) => handleStatusChange(order.id, e.target.value, order.status)}
+                  onChange={(e) =>
+                    handleStatusChange(order.id, e.target.value, order.status)
+                  }
                   className="status-dropdown"
+                  disabled={isUpdating}
                 >
                   <option value="DELIVERED">Delivered</option>
-                  <option value="FOOD_PROCESSING">Food Processing</option>
                   <option value="PENDING">Pending</option>
                 </select>
               </div>

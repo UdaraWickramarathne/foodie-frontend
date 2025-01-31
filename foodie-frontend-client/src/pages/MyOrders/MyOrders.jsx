@@ -43,16 +43,6 @@ const MyOrders = () => {
             </div>
           );
         })}
-        {/* <div className="my-orders-order">
-          <img src={assets.parcel_icon} alt="" />
-          <p>Rolls x 2</p>
-          <p>200</p>
-          <p>Items: 10</p>
-          <p>
-            <span>&#x25cf;</span> <b>PENDING</b>
-          </p>
-          <button>Track Order</button>
-        </div> */}
       </div>
     </div>
   );
