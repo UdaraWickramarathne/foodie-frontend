@@ -109,9 +109,9 @@ const LoginPopup = ({
               />
               <i className="bx bxs-lock-alt"></i>
             </div>
-            <div className="forgot-link">
+            {/* <div className="forgot-link">
               <a href="#">Forgot Password?</a>
-            </div>
+            </div> */}
             {error && <div className="error-message">{error}</div>}
             <button type="submit" className="btn">
               Login

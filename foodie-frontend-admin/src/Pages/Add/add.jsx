@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import "./add.css";
-import { assets } from "../../assets/assets";
+import { assets } from "../../assets/assets.js";
 import { AdminContext } from "../../context/AdminContext";
 
 const Add = () => {
@@ -65,7 +65,9 @@ const Add = () => {
           <div className="alert-content">
             <img
               src={
-                alertType === "success" ? assets.succes_icon : assets.error_icon
+                alertType === "success"
+                  ? assets.success_icon
+                  : assets.error_icon
               }
               alt={alertType}
             />
