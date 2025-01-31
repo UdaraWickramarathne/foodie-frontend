@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./PaymentSuccess.css";
 import animationData from "../../assets/success.json";
 import Lottie from "lottie-react";
@@ -9,12 +9,13 @@ import { StoreContext } from "../../context/StoreContext";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
-  const orderData = JSON.parse(localStorage.getItem("orderData"));
+  const orderData = JSON.parse(localStorage.getItem("orderData")) || {};
+  const [details, setDetails] = useState(orderData);
   const { token, url, setCartDetails, setOrderDetails } =
     useContext(StoreContext);
 
   useEffect(() => {
-    console.log("Order data:", orderData);
+    console.log("Order data:", details);
 
     const saveOrderData = async () => {
       try {
@@ -41,6 +42,25 @@ const PaymentSuccess = () => {
     saveOrderData();
   }, []);
 
+  function formatDateToUS(isoDateString) {
+    if (!isoDateString) return "N/A"; // Handle missing date
+    const date = new Date(isoDateString);
+
+    // Add validation for Date object
+    if (isNaN(date)) {
+      console.error("Invalid date string:", isoDateString);
+      return "Invalid Date";
+    }
+
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    };
+    return date.toLocaleDateString("en-US", options);
+  }
+
   return (
     <div className="success-container">
       <div className="success-content">
@@ -56,19 +76,11 @@ const PaymentSuccess = () => {
           <div className="details-grid">
             <div className="detail-item">
               <span>Amount Paid:</span>
-              <span>$450.00</span>
+              <span>${details.totalAmount?.toFixed(2) || "0.00"}</span>
             </div>
             <div className="detail-item">
               <span>Date:</span>
-              <span>October 15, 2023</span>
-            </div>
-            <div className="detail-item">
-              <span>Transaction ID:</span>
-              <span>PAYID-123456789</span>
-            </div>
-            <div className="detail-item">
-              <span>Payment Method:</span>
-              <span>Credit Card **** 4242</span>
+              <span>{formatDateToUS(details?.createdAt)}</span>
             </div>
           </div>
         </div>
@@ -81,8 +93,7 @@ const PaymentSuccess = () => {
         </div>
 
         <p className="email-confirmation">
-          <span className="email-icon">✉️</span>A confirmation email has been
-          sent to your registered email address.
+          A confirmation email has been sent to your registered email address.
         </p>
       </div>
     </div>

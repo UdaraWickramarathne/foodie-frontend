@@ -59,6 +59,7 @@
   border-radius: 10px;
   margin-bottom: 2rem;
   text-align: left;
+  min-width: 400px;
 }
 
 .transaction-details h2 {
@@ -69,7 +70,7 @@
 
 .details-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
 }
 
