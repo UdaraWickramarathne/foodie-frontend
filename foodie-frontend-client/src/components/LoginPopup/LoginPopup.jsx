@@ -3,6 +3,7 @@ import "./SignUp_LogIn_Form.css"; // Make sure to use the new CSS
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 
 const LoginPopup = ({
   setShowLogin,
@@ -78,11 +79,14 @@ const LoginPopup = ({
 
   return (
     <div className="auth-container">
+      <ClearOutlinedIcon
+        className="close-button"
+        onClick={() => setShowLogin(false)}
+      />
       <div className={`container ${isActive ? "active" : ""}`}>
         <div className="form-box login">
           <form onSubmit={handleLogin}>
             <h1>Login</h1>
-            {error && <div className="error-message">{error}</div>}
             <div className="input-box">
               <input
                 type="text"
@@ -108,6 +112,7 @@ const LoginPopup = ({
             <div className="forgot-link">
               <a href="#">Forgot Password?</a>
             </div>
+            {error && <div className="error-message">{error}</div>}
             <button type="submit" className="btn">
               Login
             </button>
@@ -117,7 +122,6 @@ const LoginPopup = ({
         <div className="form-box register">
           <form onSubmit={handleRegister}>
             <h1>Registration</h1>
-            {error && <div className="error-message">{error}</div>}
             <div className="input-box">
               <input
                 type="text"
@@ -140,7 +144,7 @@ const LoginPopup = ({
               />
               <i className="bx bxs-envelope"></i>
             </div>
-            <div className="input-box">
+            {/* <div className="input-box">
               <input
                 type="tel"
                 name="phone"
@@ -151,7 +155,7 @@ const LoginPopup = ({
                 onChange={onInputChange}
               />
               <i className="bx bxs-phone"></i>
-            </div>
+            </div> */}
             <div className="input-box">
               <input
                 type="text"
@@ -174,6 +178,8 @@ const LoginPopup = ({
               />
               <i className="bx bxs-lock-alt"></i>
             </div>
+            {error && <div className="error-message">{error}</div>}
+
             <button type="submit" className="btn">
               Register
             </button>
