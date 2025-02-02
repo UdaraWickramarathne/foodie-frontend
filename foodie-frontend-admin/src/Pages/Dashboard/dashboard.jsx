@@ -1,43 +1,51 @@
-import React, { useContext } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import './Dashboard.css';
-import { AdminContext } from '../../context/AdminContext';
+import React, { useContext } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import "./dashboard.css";
+import { AdminContext } from "../../context/AdminContext";
 
 const Dashboard = () => {
-  const {token} = useContext(AdminContext);  
+  const { token } = useContext(AdminContext);
   const dailyData = [
-    { date: '2023-09-01', amount: 2450 },
-    { date: '2023-09-02', amount: 3120 },
-    { date: '2023-09-03', amount: 2780 },
-    { date: '2023-09-04', amount: 2890 },
-    { date: '2023-09-05', amount: 3310 },
-    { date: '2023-09-06', amount: 2950 },
-    { date: '2023-09-07', amount: 3080 },
+    { date: "2023-09-01", amount: 2450 },
+    { date: "2023-09-02", amount: 3120 },
+    { date: "2023-09-03", amount: 2780 },
+    { date: "2023-09-04", amount: 2890 },
+    { date: "2023-09-05", amount: 3310 },
+    { date: "2023-09-06", amount: 2950 },
+    { date: "2023-09-07", amount: 3080 },
   ];
 
   const incomeData = [
-    { id: 1, date: '2023-09-01', source: 'Product Sales', amount: 2450 },
-    { id: 2, date: '2023-09-02', source: 'Services', amount: 3120 },
-    { id: 3, date: '2023-09-03', source: 'Subscriptions', amount: 2780 },
-    { id: 4, date: '2023-09-04', source: 'Product Sales', amount: 2890 },
-    { id: 5, date: '2023-09-05', source: 'Consulting', amount: 3310 },
+    { id: 1, date: "2023-09-01", source: "Product Sales", amount: 2450 },
+    { id: 2, date: "2023-09-02", source: "Services", amount: 3120 },
+    { id: 3, date: "2023-09-03", source: "Subscriptions", amount: 2780 },
+    { id: 4, date: "2023-09-04", source: "Product Sales", amount: 2890 },
+    { id: 5, date: "2023-09-05", source: "Consulting", amount: 3310 },
   ];
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    doc.text('Income Report', 20, 20);
+    doc.text("Income Report", 20, 20);
     doc.autoTable({
       startY: 30,
-      head: [['Date', 'Source', 'Amount']],
-      body: incomeData.map(item => [
+      head: [["Date", "Source", "Amount"]],
+      body: incomeData.map((item) => [
         item.date,
         item.source,
         `$${item.amount.toLocaleString()}`,
       ]),
     });
-    doc.save('income-report.pdf');
+    doc.save("income-report.pdf");
   };
 
   return (
@@ -59,10 +67,10 @@ const Dashboard = () => {
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
-                  stroke="#4CAF50" 
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#4CAF50"
                   strokeWidth={2}
                 />
               </LineChart>

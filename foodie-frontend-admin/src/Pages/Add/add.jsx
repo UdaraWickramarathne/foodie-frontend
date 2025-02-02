@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import "./add.css";
-import { assets } from "../../assets/assets";
+import { assets } from "../../assets/assets.js";
 import { AdminContext } from "../../context/AdminContext";
 
 const Add = () => {
@@ -65,7 +65,9 @@ const Add = () => {
           <div className="alert-content">
             <img
               src={
-                alertType === "success" ? assets.succes_icon : assets.error_icon
+                alertType === "success"
+                  ? assets.success_icon
+                  : assets.error_icon
               }
               alt={alertType}
             />
@@ -124,11 +126,12 @@ const Add = () => {
               <option value="">Select Category</option>
               <option value="Salad">Salad</option>
               <option value="Rolls">Rolls</option>
-              <option value="Sandvich">Sandvich</option>
+              <option value="Sandwich">Sandwich</option>
               <option value="Cake">Cake</option>
               <option value="Pure Veg">Pure Veg</option>
               <option value="Pasta">Pasta</option>
               <option value="Noodles">Noodles</option>
+              <option value="Deserts">Deserts</option>
             </select>
           </div>
           <div className="add-price flex-col">

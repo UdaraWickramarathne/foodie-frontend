@@ -1,0 +1,24 @@
+services:
+  foodie-client:
+    build:
+      context: ./foodie-frontend-client
+    ports:
+      - "5173:5173"
+    command: npm run dev
+    working_dir: /app
+    networks:
+      - react-network
+
+  foodie-admin:
+    build:
+      context: ./foodie-frontend-admin
+    ports:
+      - "5174:5174"
+    command: npm run dev
+    working_dir: /app
+    networks:
+      - react-network
+
+networks:
+  react-network:
+    driver: bridge
